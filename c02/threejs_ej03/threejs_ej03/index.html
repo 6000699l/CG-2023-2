@@ -1,0 +1,72 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animación de Cono en Three.js</title>
+</head>
+<body>
+    <img src="texturaTela.jpg" crossorigin="anonymous" id="miImagen" style="display: none;">
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+<script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const geometry = new THREE.Geometry();
+    const numSegments = 32;
+    const radius = 2;
+    const height = 3;
+
+    // Crear vértices para la base del cono
+    for (let i = 0; i <= numSegments; i++) {
+        const theta = (i / numSegments) * Math.PI * 2;
+        const x = radius * Math.cos(theta);
+        const z = radius * Math.sin(theta);
+        geometry.vertices.push(new THREE.Vector3(x, -height / 2, z));
+    }
+
+    // Vértice del vértice superior del cono
+    const topVertex = new THREE.Vector3(0, height / 2, 0);
+    geometry.vertices.push(topVertex);
+
+    // Crear caras para la base del cono
+    for (let i = 0; i < numSegments; i++) {
+        geometry.faces.push(new THREE.Face3(i, (i + 1) % numSegments, numSegments));
+    }
+
+    // Crear caras para las caras laterales
+    for (let i = 0; i < numSegments; i++) {
+        geometry.faces.push(new THREE.Face3(i, (i + 1) % numSegments, numSegments + 1));
+    }
+
+    // Calcular normales para las caras
+    geometry.computeFaceNormals();
+
+   // instantiate a loader  
+   const material = new THREE.MeshNormalMaterial({ color: 0x00ff00, wireframe: false, side : THREE.DoubleSide });
+
+// immediately use the texture for material creation 
+
+
+    const coneMesh = new THREE.Mesh(geometry, material);
+    scene.add(coneMesh);
+
+    camera.position.x = 2;
+    camera.position.z = 5;
+
+    let rotationSpeed = 0.01;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        coneMesh.rotation.y += rotationSpeed;
+        
+        coneMesh.rotation.x += rotationSpeed;
+        renderer.render(scene, camera);
+    }
+
+    animate();
+</script>
+</html>
