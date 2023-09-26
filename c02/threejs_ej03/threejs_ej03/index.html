@@ -5,7 +5,7 @@
     <title>Animación de Cono en Three.js</title>
 </head>
 <body>
-    <img src="texturaTela.jpg" crossorigin="anonymous" id="miImagen" style="display: none;">
+    
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
 <script>
@@ -45,10 +45,34 @@
     // Calcular normales para las caras
     geometry.computeFaceNormals();
 
-   // instantiate a loader  
-   const material = new THREE.MeshNormalMaterial({ color: 0x00ff00, wireframe: false, side : THREE.DoubleSide });
+   // Calcular coordenadas UV manualmente
+   geometry.faceVertexUvs[0] = [];
+    for (let i = 0; i < numSegments; i++) {
+        const u1 = i / numSegments;
+        const u2 = (i + 1) / numSegments;
+        geometry.faceVertexUvs[0].push([
+            new THREE.Vector2(u1, 1),
+            new THREE.Vector2(u2, 1),
+            new THREE.Vector2(0.5, 0.5)
+        ]);
+    }
 
-// immediately use the texture for material creation 
+    // Mapeo UV para la parte superior del cono
+    for (let i = 0; i < numSegments; i++) {
+        const u1 = i / numSegments;
+        const u2 = (i + 1) / numSegments;
+        geometry.faceVertexUvs[0].push([
+            new THREE.Vector2(u1, 0),
+            new THREE.Vector2(u2, 0),
+            new THREE.Vector2(0.5, 0.5)
+        ]);
+    }
+
+   // instantiate a loader  
+   const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('https://static.vecteezy.com/system/resources/thumbnails/003/228/080/small/fabric-pattern-texture-background-free-vector.jpg'); 
+
+    const material = new THREE.MeshBasicMaterial({ wireframe: false, side : THREE.DoubleSide,  map: texture  });
 
 
     const coneMesh = new THREE.Mesh(geometry, material);
