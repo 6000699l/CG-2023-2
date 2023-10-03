@@ -1,0 +1,11 @@
+1) ¿Qué pasa si cambia la curva por una línea recta? ¿Cómo se verá el tubo en este caso?
+
+el tubo se ve como un cilindro 
+
+2)¿Qué sucede si ajusta el grosor del tubo o cambia el material utilizado para renderizarlo?
+
+se ve diferente , dependiendo del material se va a ver con mas volumen o definicion, y el grosor del tubo hace que se vea mas ancho o delgado el tubo
+
+3) ¿Puede añadir iluminación y sombreado para mejorar la visualización del tubo?
+
+si, hace que la textura se vea mejor y agrega profundidad a la escena 
