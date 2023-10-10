@@ -14,6 +14,8 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
+        const cuboGroup = new THREE.Group(); // Grupo para los cubos
+
         function cubo(x, y, z, scale, textureUrl) {
             const textureLoader = new THREE.TextureLoader();
             const texture = textureLoader.load(textureUrl);
@@ -48,29 +50,26 @@
             // Calcular normales para las caras
             geometry.computeFaceNormals();
 
-
-
-           
             // Calcular coordenadas UV manualmente
+            geometry.faceVertexUvs[0] = [];
             for (let i = 0; i < geometry.faces.length; i++) {
                 const face = geometry.faces[i];
-                const vertexUvs = [];
+                const uvs = [];
                 for (let j = 0; j < 3; j++) {
                     const vertexIndex = face.a + (j % 3);
                     const vertex = geometry.vertices[vertexIndex];
-                    // Mapeo UV en función de la posición del vértice
-                    vertexUvs.push(new THREE.Vector2((vertex.x + 0.5), (vertex.y + 0.5)));
+                    uvs.push(new THREE.Vector2((vertex.x + 0.5), (vertex.y + 0.5)));
                 }
-                geometry.faceVertexUvs[0].push(vertexUvs);
+                geometry.faceVertexUvs[0].push(uvs);
             }
+
             const material = new THREE.MeshBasicMaterial({ wireframe: false, side: THREE.DoubleSide, map: texture });
             const customMesh = new THREE.Mesh(geometry, material);
             customMesh.position.set(x, y, z); // Ajusta la posición del cubo
             customMesh.scale.set(scale, scale, scale); // Aplica la transformación de escala
-            scene.add(customMesh); // Agregar el cubo a la escena
+            cuboGroup.add(customMesh); // Agregar el cubo al grupo
         }
 
-        
 
         camera.position.z = 5;
         camera.position.x = 2;
@@ -81,9 +80,14 @@
         cubo(0, 0.75, 0, 0.5, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ92WhhfjmzZY65s2Cjgo-cEhlaVVlX3Bu7Rw&usqp=CAU');
         cubo(0, 1.125, 0, 0.25, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUM6dzqoJ-73IyGidMUh7_QsUVKyDykblPWxt-3IDr77blBpLh8CMPgjKkB60K8yJogc8&usqp=CAU');
 
-        
+
+        // Agrega el grupo de cubos a la escena
+        scene.add(cuboGroup);
+
         function animate() {
             requestAnimationFrame(animate);
+            // Puedes mover el grupo de cubos aquí
+            cuboGroup.rotation.y += 0.01; // Rotación para demostración
             renderer.render(scene, camera);
         }
         animate();
