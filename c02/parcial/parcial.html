@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="https://threejsfundamentals.org/threejs/resources/threejs/r122/build/three.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        function cubo(x, y, z, scale) {
+            const geometry = new THREE.Geometry();
+            // Definir los vértices del prisma
+            geometry.vertices.push(
+                new THREE.Vector3(-0.5, -0.5, -0.5),
+                new THREE.Vector3(0.5, -0.5, -0.5),
+                new THREE.Vector3(0.5, -0.5, 0.5),
+                new THREE.Vector3(-0.5, -0.5, 0.5),
+                new THREE.Vector3(-0.5, 0.5, -0.5),
+                new THREE.Vector3(0.5, 0.5, -0.5),
+                new THREE.Vector3(0.5, 0.5, 0.5),
+                new THREE.Vector3(-0.5, 0.5, 0.5)
+            );
+            // Definir las caras del prisma
+            geometry.faces.push(
+                new THREE.Face3(0, 1, 5),
+                new THREE.Face3(0, 5, 4),
+                new THREE.Face3(1, 2, 6),
+                new THREE.Face3(1, 6, 5),
+                new THREE.Face3(2, 3, 7),
+                new THREE.Face3(2, 7, 6),
+                new THREE.Face3(3, 0, 4),
+                new THREE.Face3(3, 4, 7),
+                new THREE.Face3(4, 5, 6),
+                // Cómo crear una malla de polígonos personalizada en THREEjs
+                new THREE.Face3(4, 6, 7),
+                new THREE.Face3(0, 3, 2),
+                new THREE.Face3(0, 2, 1)
+            );
+            // Calcular normales para las caras
+            geometry.computeFaceNormals();
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+            const customMesh = new THREE.Mesh(geometry, material);
+            customMesh.position.set(x, y, z); // Ajusta la posición del cubo
+            customMesh.scale.set(scale, scale, scale); // Aplica la transformación de escala
+            scene.add(customMesh);
+        }
+
+        camera.position.z = 5;
+        camera.position.y = 2;
+
+        // Crea tres cubos en el origen con diferentes escalas
+        cubo(0, 0, 0, 1); // Primer cubo (escala 1)
+        cubo(2, 0, 0, 0.5); // Segundo cubo (escala 0.5)
+        cubo(4, 0, 0, 0.25); // Tercer cubo (escala 0.25)
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
