@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Ejemplo Z-Buffering en THREE.js</title>
+    <title>Ejemplo Ray Casting en THREE.js</title>
   </head>
   <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -17,46 +17,71 @@
       // Crear objetos 3D con MeshNormalMaterial
       const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
       const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-      const torusGeometry = new THREE.TorusGeometry(1, 0.2, 16, 100);
+      const objectGeometry = new THREE.TorusKnotGeometry( 4, 0.2, 100, 4,13,20 ); 
 
-      const sphereMaterial = new THREE.MeshNormalMaterial();
+     const sphereMaterial = new THREE.MeshNormalMaterial({  transparent: true, opacity: 0.7 });
       const cubeMaterial = new THREE.MeshNormalMaterial();
-      const torusMaterial = new THREE.MeshNormalMaterial();
+      const objectMaterial = new THREE.MeshNormalMaterial();
 
       const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
       const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-      const torus = new THREE.Mesh(torusGeometry, torusMaterial);
+      const object = new THREE.Mesh(objectGeometry, objectMaterial);
 
-      sphere.position.x = -2;
-      cube.position.x = 0;
-      torus.position.x = 2;
+      sphere.position.x = 2;
+      cube.position.x = 2;
+      object.position.x = 2;
 
       // Agregar objetos a la escena
       scene.add(sphere);
       scene.add(cube);
-      scene.add(torus);
+      scene.add(object);
 
       // Configurar la posición de la cámara
-      camera.position.z = 5;
+      camera.position.z = 15;
 
       // Agregar luz de color rosa
       const pinkLight = new THREE.PointLight(0xff00ff, 1, 100);
       pinkLight.position.set(2, 2, 2);
       scene.add(pinkLight);
 
+      // Configurar Ray Casting
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+
+      // Evento para detectar clics del ratón
+      document.addEventListener('mousedown', onMouseClick, false);
+
+      function onMouseClick(event) {
+        // Calcula las coordenadas del ratón en el rango [-1, 1]
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        // Actualiza el rayo de la cámara
+        raycaster.setFromCamera(mouse, camera);
+
+        // Realiza la intersección con los objetos
+        const intersects = raycaster.intersectObjects(scene.children);
+
+        if (intersects.length > 0) {
+          const intersection = intersects[0];
+          // Puedes realizar acciones basadas en la intersección aquí
+          console.log('Objeto seleccionado:', intersection.object);
+        }
+      }
+
       // Renderizar la escena y hacer que la cámara gire
       function animate() {
         requestAnimationFrame(animate);
 
         // Hacer que la cámara gire alrededor de la escena
-        camera.position.x = 5 * Math.cos(Date.now() * 0.001);
-        camera.position.z = 5 * Math.sin(Date.now() * 0.001);
+        camera.position.x = 15 * Math.cos(Date.now() * 0.001);
+        camera.position.z = 15 * Math.sin(Date.now() * 0.001);
         camera.lookAt(0, 0, 0);
 
         // Rotar los objetos
         sphere.rotation.x += 0.01;
         cube.rotation.y += 0.01;
-        torus.rotation.z += 0.01;
+       object.rotation.z += 0.01;
 
         renderer.render(scene, camera);
       }
