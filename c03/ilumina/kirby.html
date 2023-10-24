@@ -63,7 +63,37 @@
       elipsoide1.position.x = -7;
       elipsoide1.position.y = -7;
       elipsoide1.position.z = 5;
+      function crearEstrella() {
+        const estrellaShape = new THREE.Shape();
+        
+        // Define los puntos para la forma de la estrella
+        estrellaShape.moveTo(5, 0);
+        estrellaShape.lineTo(7, 10);
+        estrellaShape.lineTo(12, 10);
+        estrellaShape.lineTo(8.5, 16);
+        estrellaShape.lineTo(10.5, 24);
+        estrellaShape.lineTo(5, 19);
+        estrellaShape.lineTo(-0.5, 24);
+        estrellaShape.lineTo(1.5, 16);
+        estrellaShape.lineTo(-2, 10);
+        estrellaShape.lineTo(3, 10);
+        
+        const extrudeSettings = {
+          depth: 5, // Profundidad de la extrusión
+          bevelEnabled: false, // Sin biselado
+        };
 
+        const estrellaGeometry = new THREE.ExtrudeGeometry(estrellaShape, extrudeSettings);
+        const estrellaMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700 }); // Color dorado
+
+        const estrella = new THREE.Mesh(estrellaGeometry, estrellaMaterial);
+        estrella.position.x=5;
+    
+        scene.add(estrella);
+        return estrella;
+      }
+
+      const estrella = crearEstrella();   
 
       // Función para configurar las luces
       function hacerLuces() {
