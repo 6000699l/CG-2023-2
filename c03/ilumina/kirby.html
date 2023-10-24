@@ -5,12 +5,18 @@
     <title>Three.js Example</title>
   </head>
   <body>
-    <div id="container"></div>
+    <div id="container">
+        <button id="activateLight1">Luz superior</button>
+        <button id="activateLight2">arribaLightOn</button>
+        <button id="activateLight0">luz ambiental</button>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
       const scene = new THREE.Scene();
+      
+      scene.background = new THREE.Color(0xffffff); // Establecer el fondo blanco
 
       const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.z = 50; // Alejamos la cámara
@@ -20,50 +26,80 @@
       document.getElementById('container').appendChild(renderer.domElement);
 
       const textureLoader = new THREE.TextureLoader();
-      const texture = textureLoader.load('https://cdnb.artstation.com/p/assets/images/images/022/597/883/large/grace-gdays-kirbyfromslime2.jpg?1576018854'); // Reemplaza 'tu_ruta/imagen.jpg' con la ruta de tu imagen
+      const texture = textureLoader.load('https://images.ctfassets.net/jd1mlth317j4/51PXJVvBy6ts6klRNbucXI/f534adf473cff992bb2499cda0b0495d/Kirby_Special_site.png'); // Reemplaza 'tu_ruta/imagen.jpg' con la ruta de tu imagen
 
-      const spherematerial = new THREE.MeshBasicMaterial({ map: texture });
+      const spherematerial = new THREE.MeshStandardMaterial({ map: texture });
+      // Establecer el desplazamiento de textura para un solo desplazamiento a la izquierda
+      spherematerial.map.wrapS = THREE.RepeatWrapping;
+      spherematerial.map.offset.x = 0.25; // Ajusta el valor según tus necesidades
+
       const spheregeometry = new THREE.SphereGeometry(10, 32, 32);
       const sphere = new THREE.Mesh(spheregeometry, spherematerial);
       scene.add(sphere);
 
-      const manos = new THREE.SphereGeometry(5, 32, 32);
-      const spherematerial1 = new THREE.MeshBasicMaterial({ color: 0xffa3c3 });
+      const manos = new THREE.SphereGeometry(4, 32, 32);
+      const spherematerial1 = new THREE.MeshStandardMaterial({ color: 0xffa3c3 });
       const mano1 = new THREE.Mesh(manos, spherematerial1);
       const mano2 = new THREE.Mesh(manos, spherematerial1);
       
       scene.add(mano1,mano2);
-      mano1.position.x= 7;
+      mano1.position.x= 9;
       mano1.position.y= 2;
-      mano2.position.x= -7;
+      mano2.position.x= -9;
       mano2.position.y= 2;
 
-        // Crear una esfera y ajustar su escala para formar un elipsoide
-        const elipsoideGeometry = new THREE.SphereGeometry(1, 16, 16);
-        elipsoideGeometry.scale(3, 3, 6); // Escalamos en los ejes X y Y
+      // Crear una esfera y ajustar su escala para formar un elipsoide
+      const elipsoideGeometry = new THREE.SphereGeometry(1, 16, 16);
+      elipsoideGeometry.scale(3, 3, 6); // Escalamos en los ejes X y Y
 
-      const elipsoideMaterial = new THREE.MeshToonMaterial({ color: 0xffa3c3 });
+      const elipsoideMaterial = new THREE.MeshStandardMaterial({ color: 0xff3385 });
       const elipsoide = new THREE.Mesh(elipsoideGeometry, elipsoideMaterial);
       scene.add(elipsoide);
-      elipsoide.position.x= 7;
-      elipsoide.position.y= -7;
-      elipsoide.position.z= 3;
+      elipsoide.position.x = 7;
+      elipsoide.position.y = -7;
+      elipsoide.position.z = 5;
       const elipsoide1 = new THREE.Mesh(elipsoideGeometry, elipsoideMaterial);
       scene.add(elipsoide1);
-      elipsoide1.position.x= -7;
-      elipsoide1.position.y= -7;
-      elipsoide1.position.z= 3;
+      elipsoide1.position.x = -7;
+      elipsoide1.position.y = -7;
+      elipsoide1.position.z = 5;
 
 
+      // Función para configurar las luces
+      function hacerLuces() {
+        light0 = new THREE.AmbientLight ( 0x202020 , 3); // 10%    
+        scene.add(light0);
 
+        light1 = new THREE.PointLight(0xffae00, 1); // 50%
+        light1.position.set(-12, 15, 10);
+        scene.add(light1);
 
-      var hemiLight = new THREE.HemisphereLight(0x0000ff, 0x00ff00, 0.6);
-      hemiLight.position.set(0, 500, 0);
-      scene.add(hemiLight);
+        light2 = new THREE.DirectionalLight(0x00ffd5, 0.8);
+        light2.position.set(0, 150, 10);
+        scene.add(light2); 
+        light0.visible = true;
+        light1.visible = true; // Inicialmente desactivamos esta luz
+        light2.visible = true; // Inicialmente desactivamos esta luz
+      }
 
-      var redLight = new THREE.PointLight(0xff0000, 20, 100);
-      redLight.position.set(0, 0, 10); // Coloca la luz roja en una posición
-      scene.add(redLight);
+      // Llamar a la función para configurar las luces
+      hacerLuces();
+
+      // Agregar eventos para activar cada luz
+      const activateLight1Button = document.getElementById('activateLight1');
+      activateLight1Button.addEventListener('click', () => {
+        light1.visible = !light1.visible; // Alternar la visibilidad de la luz 1
+      });
+
+      const activateLight2Button = document.getElementById('activateLight2');
+      activateLight2Button.addEventListener('click', () => {
+        light2.visible = !light2.visible; // Alternar la visibilidad de la luz 2
+      });
+
+      const activateLight0Button = document.getElementById('activateLight0');
+      activateLight0Button.addEventListener('click', () => {
+        light0.visible = !light0.visible; // Alternar la visibilidad de la luz 2
+      });
 
       // Renderizar la escena y hacer que la cámara gire
       function animate() {
@@ -81,4 +117,3 @@
     </script>
   </body>
 </html>
-
