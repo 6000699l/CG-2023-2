@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Three.js Example</title>
+  </head>
+  <body>
+    <div id="container">
+      <button id="activateLocalShading">Sombreado Local</button>
+      <button id="activateFlatShading">Sombreado Plano</button>
+      <button id="activateGouraudShading">Sombreado Gouraud</button>
+      <button id="activatePhongShading">Sombreado Phong</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+      const scene = new THREE.Scene();
+      
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 50; // Alejamos la cámara
+
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.getElementById('container').appendChild(renderer.domElement);
+      const light1 = new THREE.PointLight(0xffae00, 1); // 50%
+      light1.position.set(12, 15, 50);
+      const light2 = new THREE.PointLight(0xfea8ff, 1); // 50%
+      light2.position.set(12, -15, -50);
+      scene.add(light1,light2);
+      
+      light0 = new THREE.AmbientLight ( 0x202020 , 3); // 10%    
+        scene.add(light0);
+      let currentMaterial = createLocalShadingMaterial();
+
+      const spheregeometry = new THREE.SphereGeometry(10, 32, 32);
+      const sphere = new THREE.Mesh(spheregeometry, currentMaterial);
+      scene.add(sphere);
+
+      // Define los materiales para cada tipo de sombreado
+      function createLocalShadingMaterial() {
+        const localShadingMaterial = new THREE.ShaderMaterial({
+          vertexShader: `
+            varying vec3 vNormal;
+            void main() {
+              vNormal = normal;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            varying vec3 vNormal;
+            void main() {
+              vec3 lightDirection = normalize(vec3(1, 1, 1));
+              float brightness = dot(vNormal, lightDirection);
+              gl_FragColor = vec4(vec3(brightness), 1.0);
+            }
+          `,
+        });
+        return localShadingMaterial;
+      }
+
+      function createFlatShadingMaterial() {
+        return new THREE.MeshLambertMaterial({ color:0x00ff9d,flatShading: true });
+      }
+
+      function createGouraudShadingMaterial() {
+        return new THREE.MeshLambertMaterial({color:0x00ff9d});
+      }
+
+      function createPhongShadingMaterial() {
+        return new THREE.MeshPhongMaterial({color:0x00ff9d});
+      }
+
+      // Agregar eventos para activar o desactivar cada tipo de sombreado
+      const shadingButtons = {
+        'activateLocalShading': createLocalShadingMaterial,
+        'activateFlatShading': createFlatShadingMaterial,
+        'activateGouraudShading': createGouraudShadingMaterial,
+        'activatePhongShading': createPhongShadingMaterial,
+      };
+
+      for (const buttonId in shadingButtons) {
+        const button = document.getElementById(buttonId);
+        button.addEventListener('click', () => {
+          currentMaterial = shadingButtons[buttonId]();
+          sphere.material = currentMaterial; // Actualizar el material de la esfera
+        });
+      }
+
+      // Renderizar la escena y hacer que la cámara gire
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Hacer que la cámara gire alrededor de la escena
+        camera.position.x = 50 * Math.cos(Date.now() * 0.001);
+        camera.position.z = 50 * Math.sin(Date.now() * 0.001);
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>
